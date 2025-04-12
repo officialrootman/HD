@@ -1,1 +1,2 @@
 realesrgan
+opencv-python
