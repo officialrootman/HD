@@ -6,7 +6,7 @@ NUMBERS="0123456789"
 SPECIALS="@_-."
 
 # Wordlist dosyasının adı
-OUTPUT="turkce_wordlist.txt"
+OUTPUT="rockyou.txt"
 
 # Kullanıcıdan şifre uzunluğu ve sayı alıyoruz
 read -p "Şifre uzunluğu (örneğin 6-12): " MIN_LEN
